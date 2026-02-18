@@ -5,7 +5,7 @@ resource "aws_vpc" "my_vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name = "my-first-vpc"
+    Name = "my-new-vpc"
   }
 }
 
@@ -16,7 +16,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
-    Name = "my-igw"
+    Name = "my-igw-new"
   }
 }
 
@@ -30,7 +30,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-subnet"
+    Name = "public-subnet-new"
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "public-rt"
+    Name = "public-route"
   }
 }
 
@@ -82,34 +82,6 @@ resource "aws_security_group" "ec2_sg" {
 }
 
 ####################
-# IAM Role for SSM
-####################
-resource "aws_iam_role" "ssm_role" {
-  name = "ec2-ssm-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ssm_policy" {
-  role       = aws_iam_role.ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "ssm_profile" {
-  name = "ec2-ssm-profile"
-  role = aws_iam_role.ssm_role.name
-}
-
-####################
 # EC2 Instance
 ####################
 resource "aws_instance" "my_ec2" {
@@ -119,9 +91,8 @@ resource "aws_instance" "my_ec2" {
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   key_name               = var.key_name
 
-  iam_instance_profile = aws_iam_instance_profile.ssm_profile.name
 
   tags = {
-    Name = "my-2nd-ec2"
+    Name = "my-new-ec2"
   }
 }
